@@ -32,6 +32,9 @@ class AIEngine:
         start_time = time.time()
         run_id = str(uuid.uuid4())
         
+        # Reset force_offline_mode at the start of each new campaign screening run
+        self.orchestrator.force_offline_mode = False
+        
         # 1. Parse Job Description Requirements
         jd_requirements = extract_jd_requirements(jd_text, role_title)
         
