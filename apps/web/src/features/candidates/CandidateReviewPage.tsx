@@ -248,6 +248,19 @@ export const CandidateReviewPage: React.FC = () => {
                     />
                   </div>
                 </div>
+
+                {/* Model routing telemetry */}
+                <div className="w-full h-px bg-zinc-200 my-1" />
+                <div className="text-left space-y-1 text-[10px] font-mono text-zinc-400">
+                  <div className="flex justify-between">
+                    <span>AI Model:</span>
+                    <span className="font-bold text-zinc-600">{selectedCandidate.model_used || "Offline Fallback"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Latency:</span>
+                    <span className="font-bold text-zinc-600">{selectedCandidate.latency ? `${selectedCandidate.latency}s` : "0.0s"}</span>
+                  </div>
+                </div>
               </div>
             </div>
 

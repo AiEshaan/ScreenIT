@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-resume_screening/main.py
+resume_screening/pipeline.py
 --------------------------
 CLI entry point for the Resume Screening Agent.
 
 Usage:
-    python -m resume_screening.main \\
+    python -m app.ai.pipeline \\
         --jd sample_data/job_description.txt \\
         --resumes sample_data/resumes/ \\
         --output output/ \\
@@ -48,9 +48,9 @@ except ImportError:
         def __getattr__(self, _): return ""
     Fore = Style = _NoColor()
 
-from backend.app.ai.parser import extract_text, parse_resume
-from backend.app.ai.extractor import extract_jd_requirements
-from backend.app.ai.ranking import rank_candidates, generate_recruiter_summary
+from app.ai.parser import extract_text, parse_resume
+from app.ai.extractor import extract_jd_requirements
+from app.ai.ranking import rank_candidates, generate_recruiter_summary
 
 
 # ── Banner ────────────────────────────────────────────────────────────────────
@@ -308,10 +308,10 @@ def main() -> None:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
             "Examples:\n"
-            "  python -m resume_screening.main \\\n"
+            "  python -m app.ai.pipeline \\\n"
             "      --jd sample_data/job_description.txt \\\n"
             "      --resumes sample_data/resumes/\n\n"
-            "  python -m resume_screening.main \\\n"
+            "  python -m app.ai.pipeline \\\n"
             "      --jd jd.txt --resumes resumes/ --top-n 3 --output results/"
         ),
     )

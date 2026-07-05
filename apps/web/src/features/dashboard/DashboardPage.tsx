@@ -12,10 +12,17 @@ export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const setActiveRun = useScreeningStore((s) => s.setActiveRun);
 
-  const { data: runs, isLoading } = useQuery({
+  const { data: runs, isLoading: isRunsLoading } = useQuery({
     queryKey: ["runs"],
     queryFn: api.getRuns,
   });
+
+  const { data: analytics, isLoading: isAnalyticsLoading } = useQuery({
+    queryKey: ["analytics"],
+    queryFn: api.getAnalytics,
+  });
+
+
 
   const handleResumeRun = async (runId: string) => {
     try {
@@ -27,29 +34,50 @@ export const DashboardPage: React.FC = () => {
     }
   };
 
-  // Calculate Metrics from run list
-  const candidatesScreened = runs?.reduce((acc, curr) => acc + curr.candidate_count, 0) || 0;
-  // Calculate mock processing times based on actual runs
-  const avgProcessingTime = runs && runs.length > 0
-    ? (runs.reduce((acc, curr) => acc + (curr.processing_time || curr.candidate_count * 1.8), 0) / runs.length).toFixed(1)
-    : "0";
-  
   const metrics = [
-    { label: "Candidates Screened", value: candidatesScreened.toString(), icon: Users },
-    { label: "Interview Ready", value: Math.floor(candidatesScreened * 0.3).toString(), icon: Award },
-    { label: "Average Match", value: candidatesScreened > 0 ? "78%" : "0%", icon: Zap },
-    { label: "Avg Processing Time", value: `< ${avgProcessingTime}s`, icon: Clock },
+    { 
+      label: "Candidates Screened", 
+      value: analytics?.total_candidates?.toString() || "0", 
+      icon: Users 
+    },
+    { 
+      label: "Interview Ready", 
+      value: analytics?.interview_ready?.toString() || "0", 
+      icon: Award 
+    },
+    { 
+      label: "Average Match", 
+      value: analytics?.avg_score ? `${analytics.avg_score}%` : "0%", 
+      icon: Zap 
+    },
+    { 
+      label: "Avg Processing Time", 
+      value: analytics?.avg_processing_time ? `${analytics.avg_processing_time}s` : "0s", 
+      icon: Clock 
+    },
   ];
+
+  const formatDate = (dateStr: string) => {
+    try {
+      const normalized = dateStr.includes(" ") && !dateStr.includes("T")
+        ? dateStr.replace(" ", "T") + "Z"
+        : dateStr;
+      const d = new Date(normalized);
+      return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString();
+    } catch (e) {
+      return dateStr;
+    }
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="p-10 max-w-6xl w-full mx-auto space-y-12"
+      className="p-10 max-w-6xl w-full mx-auto space-y-10"
     >
       {/* Product Hero */}
-      <div className="flex flex-col items-center text-center space-y-6 pt-8 pb-10 border-b border-zinc-200">
+      <div className="flex flex-col items-center text-center space-y-6 pt-6 pb-10 border-b border-zinc-200">
         <h1 className="text-4xl font-bold tracking-tight text-zinc-950 font-sans">
           ScreenIt
         </h1>
@@ -87,7 +115,7 @@ export const DashboardPage: React.FC = () => {
       <div className="bg-zinc-50/50 border border-zinc-200 rounded-2xl p-8 shadow-sm">
         <div className="flex items-center justify-between mb-8">
           <h3 className="text-sm font-semibold text-zinc-900">Active AI Pipeline</h3>
-          <span className="text-[10px] uppercase font-mono tracking-wider text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+          <span className="text-[10px] uppercase font-mono tracking-wider px-2 py-0.5 rounded-full border font-bold text-emerald-600 bg-emerald-50 border-emerald-100">
             System Online
           </span>
         </div>
@@ -114,14 +142,18 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {metrics.map((m) => (
           <div key={m.label} className="p-5 border border-zinc-200 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start">
               <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold">{m.label}</span>
               <m.icon className="w-4 h-4 text-zinc-400 stroke-[1.5]" />
             </div>
-            <p className="mt-4 text-3xl font-semibold tracking-tight text-zinc-900">{m.value}</p>
+            {isAnalyticsLoading ? (
+              <div className="h-9 mt-4 w-12 bg-zinc-100 animate-pulse rounded" />
+            ) : (
+              <p className="mt-4 text-3xl font-semibold tracking-tight text-zinc-900">{m.value}</p>
+            )}
           </div>
         ))}
       </div>
@@ -129,7 +161,7 @@ export const DashboardPage: React.FC = () => {
       {/* Recent Activity */}
       <div className="space-y-4 pt-4">
         <h2 className="text-lg font-semibold tracking-tight text-zinc-900">Recent Campaigns</h2>
-        {isLoading ? (
+        {isRunsLoading ? (
           <div className="p-12 flex justify-center border border-zinc-200 rounded-xl border-dashed">
             <Spinner />
           </div>
@@ -138,13 +170,13 @@ export const DashboardPage: React.FC = () => {
             <p className="text-zinc-500 text-sm">No campaigns yet. Start your first screening.</p>
           </div>
         ) : (
-          <div className="border border-zinc-200 rounded-xl overflow-hidden divide-y divide-zinc-200 bg-white">
+          <div className="border border-zinc-200 rounded-xl overflow-hidden divide-y divide-zinc-200 bg-white shadow-sm">
             {runs.slice(0, 5).map((run) => (
               <div key={run.run_id} className="p-4 flex items-center justify-between hover:bg-zinc-50 transition-colors group">
                 <div className="space-y-1">
                   <h3 className="font-medium text-zinc-900 text-sm">{run.role_title}</h3>
                   <p className="text-xs text-zinc-500 font-mono">
-                    {run.candidate_count} Candidates • {new Date(run.created_at).toLocaleDateString()}
+                    {run.candidate_count} Candidates • {formatDate(run.created_at)}
                   </p>
                 </div>
                 <Button 
@@ -163,3 +195,4 @@ export const DashboardPage: React.FC = () => {
     </motion.div>
   );
 };
+

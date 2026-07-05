@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Sparkles } from "lucide-react";
+import { useScreeningStore } from "../../store/screeningStore";
 
 export const ProcessingPage: React.FC = () => {
+  const navigate = useNavigate();
+  const activeRun = useScreeningStore((s) => s.activeRun);
   const [stage, setStage] = useState(0);
 
   const stages = [
@@ -13,13 +17,30 @@ export const ProcessingPage: React.FC = () => {
     "Completed"
   ];
 
+  // Auto-transition UI stages
   useEffect(() => {
     const interval = setInterval(() => {
-      setStage((prev) => (prev < stages.length - 1 ? prev + 1 : prev));
-    }, 1500); // cycle stages quickly for the demo/feel
+      setStage((prev) => {
+        if (prev < stages.length - 2) {
+          return prev + 1;
+        }
+        return prev;
+      });
+    }, 1200);
     
     return () => clearInterval(interval);
   }, [stages.length]);
+
+  // Navigate to review once activeRun is set
+  useEffect(() => {
+    if (activeRun) {
+      setStage(stages.length - 1);
+      const timeout = setTimeout(() => {
+        navigate(`/screen/${activeRun.run_id}/review`);
+      }, 800);
+      return () => clearTimeout(timeout);
+    }
+  }, [activeRun, navigate, stages.length]);
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-10 bg-white">
@@ -54,7 +75,7 @@ export const ProcessingPage: React.FC = () => {
               >
                 <div className="flex justify-between items-center text-xs font-mono font-bold tracking-wider uppercase">
                   <span className={`${isActive ? "text-zinc-950" : "text-zinc-500"}`}>{stg}</span>
-                  {isCompleted && <span className="text-emerald-500">Done</span>}
+                  {isCompleted && <span className="text-emerald-500 font-bold">Done</span>}
                 </div>
                 <div className="flex gap-1">
                   {[...Array(10)].map((_, i) => (
@@ -64,7 +85,7 @@ export const ProcessingPage: React.FC = () => {
                         isCompleted 
                           ? "bg-zinc-900" 
                           : isActive && i < 6 
-                            ? "bg-zinc-900 animate-pulse delay-" + (i * 100) 
+                            ? "bg-zinc-900 animate-pulse" 
                             : "bg-zinc-200"
                       }`} 
                     />
@@ -78,3 +99,4 @@ export const ProcessingPage: React.FC = () => {
     </div>
   );
 };
+

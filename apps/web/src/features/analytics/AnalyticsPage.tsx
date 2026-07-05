@@ -6,9 +6,9 @@ import { Spinner } from "../../components/ui/Spinner";
 import { motion } from "framer-motion";
 
 export const AnalyticsPage: React.FC = () => {
-  const { isLoading } = useQuery({
-    queryKey: ["runs"],
-    queryFn: api.getRuns,
+  const { data: analytics, isLoading } = useQuery({
+    queryKey: ["analytics"],
+    queryFn: api.getAnalytics,
   });
 
   if (isLoading) {
@@ -43,7 +43,7 @@ export const AnalyticsPage: React.FC = () => {
             <span className="text-[10px] font-mono uppercase tracking-wider font-bold">Top Candidate Skill</span>
           </div>
           <div>
-            <h2 className="text-4xl font-bold text-zinc-950 tracking-tight">Python</h2>
+            <h2 className="text-4xl font-bold text-zinc-950 tracking-tight">{analytics?.top_skill || "Python"}</h2>
             <p className="text-xs text-zinc-500 mt-2 leading-relaxed">Most frequently matched skill across all successful candidates.</p>
           </div>
         </div>
@@ -54,7 +54,7 @@ export const AnalyticsPage: React.FC = () => {
             <span className="text-[10px] font-mono uppercase tracking-wider font-bold">Most Missing Skill</span>
           </div>
           <div>
-            <h2 className="text-4xl font-bold text-zinc-950 tracking-tight">Kubernetes</h2>
+            <h2 className="text-4xl font-bold text-zinc-950 tracking-tight">{analytics?.most_missing_skill || "Kubernetes"}</h2>
             <p className="text-xs text-zinc-500 mt-2 leading-relaxed">The most common gap in profiles for DevOps/Backend roles.</p>
           </div>
         </div>
@@ -65,7 +65,7 @@ export const AnalyticsPage: React.FC = () => {
             <span className="text-[10px] font-mono uppercase tracking-wider font-bold">Average Resume Score</span>
           </div>
           <div>
-            <h2 className="text-4xl font-bold text-zinc-950 tracking-tight">81%</h2>
+            <h2 className="text-4xl font-bold text-zinc-950 tracking-tight">{analytics?.avg_score || 0}%</h2>
             <p className="text-xs text-zinc-500 mt-2 leading-relaxed">Candidates are generally well-qualified for the open roles.</p>
           </div>
         </div>
@@ -76,7 +76,7 @@ export const AnalyticsPage: React.FC = () => {
             <span className="text-[10px] font-mono uppercase tracking-wider font-bold">Average Experience</span>
           </div>
           <div>
-            <h2 className="text-4xl font-bold text-zinc-950 tracking-tight">4.2 <span className="text-xl font-medium text-zinc-500">Years</span></h2>
+            <h2 className="text-4xl font-bold text-zinc-950 tracking-tight">{analytics?.avg_experience || 0} <span className="text-xl font-medium text-zinc-500">Years</span></h2>
             <p className="text-xs text-zinc-500 mt-2 leading-relaxed">Across all uploaded candidate resumes in the database.</p>
           </div>
         </div>
@@ -88,11 +88,11 @@ export const AnalyticsPage: React.FC = () => {
           </div>
           <div className="flex justify-between items-end">
             <div>
-              <h2 className="text-4xl font-bold text-zinc-950 tracking-tight">Priya Sharma</h2>
-              <p className="text-xs text-zinc-500 mt-2 leading-relaxed max-w-sm">Top percentile match for Senior Backend Engineer. Excellent AI/ML background.</p>
+              <h2 className="text-4xl font-bold text-zinc-950 tracking-tight">{analytics?.highest_candidate?.name || "N/A"}</h2>
+              <p className="text-xs text-zinc-500 mt-2 leading-relaxed max-w-sm truncate">{analytics?.highest_candidate?.brief || "No brief details."}</p>
             </div>
-            <div className="text-right">
-              <span className="text-4xl font-bold text-zinc-950 font-mono">91</span>
+            <div className="text-right shrink-0">
+              <span className="text-4xl font-bold text-zinc-950 font-mono">{analytics?.highest_candidate?.score || 0}</span>
               <span className="text-zinc-400 font-mono text-xl">/100</span>
             </div>
           </div>
@@ -101,3 +101,4 @@ export const AnalyticsPage: React.FC = () => {
     </motion.div>
   );
 };
+

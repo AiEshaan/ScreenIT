@@ -29,7 +29,7 @@ try:
 except ImportError:
     PYMUPDF_AVAILABLE = False
 
-from backend.app.ai.skills_database import extract_skills
+from app.ai.skills_database import extract_skills
 
 
 # ── Public API ────────────────────────────────────────────────────────────────

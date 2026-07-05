@@ -46,9 +46,41 @@ def init_db():
         weaknesses TEXT,               -- JSON string
         interview_questions TEXT,      -- JSON string
         raw_profile TEXT,              -- JSON string
+        model_used TEXT DEFAULT '',
+        latency REAL DEFAULT 0.0,
         FOREIGN KEY (run_id) REFERENCES runs (run_id) ON DELETE CASCADE
     )
     """)
+
+    # Try to add model_used and latency columns to candidates if the table already existed without them
+    try:
+        cursor.execute("ALTER TABLE candidates ADD COLUMN model_used TEXT DEFAULT ''")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        cursor.execute("ALTER TABLE candidates ADD COLUMN latency REAL DEFAULT 0.0")
+    except sqlite3.OperationalError:
+        pass
+    
+    # Model Routing Matrix Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS routing_prefs (
+        task TEXT PRIMARY KEY,
+        models_json TEXT NOT NULL
+    )
+    """)
+
+    # Populate default routing presets if not present
+    cursor.execute("SELECT COUNT(*) FROM routing_prefs")
+    if cursor.fetchone()[0] == 0:
+        defaults = {
+            "parsing": ["qwen", "openai", "anthropic", "gemini", "offline"],
+            "summary": ["openai", "qwen", "anthropic", "gemini", "offline"],
+            "questions": ["anthropic", "openai", "qwen", "gemini", "offline"],
+            "default": ["openai", "qwen", "anthropic", "gemini", "offline"]
+        }
+        for task, cascade in defaults.items():
+            cursor.execute("INSERT INTO routing_prefs (task, models_json) VALUES (?, ?)", (task, json.dumps(cascade)))
     
     conn.commit()
     conn.close()
@@ -73,8 +105,9 @@ def save_candidate(cand: Dict[str, Any]):
             overall_score, confidence, match_status, scores, 
             experience_years, education_degree, matched_skills, 
             missing_skills, why_reasoning, risk_factors, recruiter_brief, 
-            strengths, weaknesses, interview_questions, raw_profile
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            strengths, weaknesses, interview_questions, raw_profile,
+            model_used, latency
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             cand["id"],
@@ -98,7 +131,9 @@ def save_candidate(cand: Dict[str, Any]):
             json.dumps(cand.get("strengths", [])),
             json.dumps(cand.get("weaknesses", [])),
             json.dumps(cand.get("interview_questions", [])),
-            json.dumps(cand.get("raw_profile", {}))
+            json.dumps(cand.get("raw_profile", {})),
+            cand.get("model_used", ""),
+            cand.get("latency", 0.0)
         )
     )
     conn.commit()
@@ -154,3 +189,100 @@ def get_run_details(run_id: str) -> Optional[Dict[str, Any]]:
         
     run_data["candidates"] = candidates
     return run_data
+
+def get_routing_prefs() -> Dict[str, List[str]]:
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT task, models_json FROM routing_prefs")
+    rows = cursor.fetchall()
+    conn.close()
+    return {row[0]: json.loads(row[1]) for row in rows}
+
+def update_routing_prefs(prefs: Dict[str, List[str]]):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    for task, cascade in prefs.items():
+        cursor.execute(
+            "INSERT OR REPLACE INTO routing_prefs (task, models_json) VALUES (?, ?)",
+            (task, json.dumps(cascade))
+        )
+    conn.commit()
+    conn.close()
+
+def get_analytics_dashboard() -> Dict[str, Any]:
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    # 1. Total runs and candidates
+    cursor.execute("SELECT COUNT(*) FROM runs")
+    total_campaigns = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT COUNT(*) FROM candidates")
+    total_candidates = cursor.fetchone()[0]
+    
+    # 2. Avg overall score
+    cursor.execute("SELECT AVG(overall_score) FROM candidates")
+    avg_score = cursor.fetchone()[0] or 0.0
+    
+    # 3. Avg experience
+    cursor.execute("SELECT AVG(experience_years) FROM candidates")
+    avg_experience = cursor.fetchone()[0] or 0.0
+    
+    # 4. Interview ready candidates (overall_score >= 80)
+    cursor.execute("SELECT COUNT(*) FROM candidates WHERE overall_score >= 80")
+    interview_ready = cursor.fetchone()[0]
+    
+    # 5. Avg processing time (runs)
+    cursor.execute("SELECT AVG(processing_time) FROM runs")
+    avg_processing_time = cursor.fetchone()[0] or 0.0
+    
+    # 6. Top matched skills and missing skills
+    cursor.execute("SELECT matched_skills, missing_skills FROM candidates")
+    all_rows = cursor.fetchall()
+    
+    matched_freq = {}
+    missing_freq = {}
+    for row in all_rows:
+        try:
+            m_skills = json.loads(row[0])
+            for s in m_skills:
+                matched_freq[s] = matched_freq.get(s, 0) + 1
+        except Exception:
+            pass
+            
+        try:
+            miss_skills = json.loads(row[1])
+            for s in miss_skills:
+                missing_freq[s] = missing_freq.get(s, 0) + 1
+        except Exception:
+            pass
+            
+    top_matched = sorted(matched_freq.items(), key=lambda x: x[1], reverse=True)
+    top_missing = sorted(missing_freq.items(), key=lambda x: x[1], reverse=True)
+    
+    top_skill = top_matched[0][0] if top_matched else "Python"
+    most_missing_skill = top_missing[0][0] if top_missing else "Kubernetes"
+    
+    # 7. Highest ranked candidate
+    cursor.execute("SELECT name, overall_score, recruiter_brief FROM candidates ORDER BY overall_score DESC LIMIT 1")
+    highest_row = cursor.fetchone()
+    highest_candidate = {
+        "name": highest_row[0] if highest_row else "No Candidates",
+        "score": highest_row[1] if highest_row else 0.0,
+        "brief": highest_row[2] if highest_row else "N/A"
+    }
+    
+    conn.close()
+    
+    return {
+        "total_campaigns": total_campaigns,
+        "total_candidates": total_candidates,
+        "avg_score": round(avg_score, 1),
+        "avg_experience": round(avg_experience, 1),
+        "interview_ready": interview_ready,
+        "avg_processing_time": round(avg_processing_time, 2),
+        "top_skill": top_skill,
+        "most_missing_skill": most_missing_skill,
+        "highest_candidate": highest_candidate
+    }
+

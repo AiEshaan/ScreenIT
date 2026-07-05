@@ -28,6 +28,8 @@ export interface Candidate {
   weaknesses?: string[];
   interview_questions?: string[];
   raw_profile?: any;
+  model_used?: string;
+  latency?: number;
 }
 
 export interface ScreeningRun {

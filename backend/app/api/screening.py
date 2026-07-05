@@ -6,8 +6,9 @@ import os
 import shutil
 import tempfile
 
-from backend.app.services.screening_service import AIEngine
-from backend.app.db.sqlite import init_db, save_run, save_candidate, get_runs, get_run_details
+from app.services.screening_service import AIEngine
+from app.db.sqlite import init_db, save_run, save_candidate, get_runs, get_run_details, get_analytics_dashboard
+from app.api.system import router as system_router
 
 app = FastAPI(title="ScreenIt API", description="AI Resume Screening Platform Backend")
 
@@ -19,6 +20,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(system_router)
 
 engine = AIEngine()
 
@@ -91,3 +94,11 @@ async def get_run(run_id: str):
     if not details:
         raise HTTPException(status_code=404, detail="Campaign run not found")
     return details
+
+@app.get("/api/analytics")
+async def get_analytics():
+    try:
+        return get_analytics_dashboard()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

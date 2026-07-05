@@ -26,6 +26,18 @@ export const HistoryPage: React.FC = () => {
     }
   };
 
+  const formatDate = (dateStr: string) => {
+    try {
+      const normalized = dateStr.includes(" ") && !dateStr.includes("T")
+        ? dateStr.replace(" ", "T") + "Z"
+        : dateStr;
+      const d = new Date(normalized);
+      return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString();
+    } catch (e) {
+      return dateStr;
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -84,7 +96,7 @@ export const HistoryPage: React.FC = () => {
                     </span>
                   </td>
                   <td className="p-4 text-zinc-500 font-mono text-xs">
-                    {new Date(run.created_at).toLocaleDateString()}
+                    {formatDate(run.created_at)}
                   </td>
                   <td className="p-4 pr-6 text-right">
                     <button className="inline-flex items-center gap-1.5 text-xs text-zinc-500 font-medium group-hover:text-zinc-950 transition-colors">

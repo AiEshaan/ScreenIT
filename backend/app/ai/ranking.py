@@ -25,11 +25,11 @@ from __future__ import annotations
 import os
 from typing import Optional
 
-from backend.app.ai.extractor import (
+from app.ai.extractor import (
     get_education_level,
     get_experience_years,
 )
-from backend.app.ai.similarity import (
+from app.ai.similarity import (
     compute_education_score,
     compute_experience_score,
     compute_semantic_similarity,

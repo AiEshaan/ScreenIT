@@ -6,24 +6,24 @@ import time
 from typing import List, Dict, Any
 
 # Adjust paths to make sure we can import from original resume_screening and shared
-workspace_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+workspace_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 if workspace_root not in sys.path:
     sys.path.insert(0, workspace_root)
 
-from backend.app.ai.extractor import extract_jd_requirements, get_education_level, get_experience_years
-from backend.app.ai.ranking import score_candidate
+from app.ai.extractor import extract_jd_requirements, get_education_level, get_experience_years
+from app.ai.ranking import score_candidate
 
-from backend.app.ai.llm_router import LLMRouter, LLMTask
-from backend.app.ai.parser import parse_candidate_resume
-from backend.app.ai.embeddings import calculate_similarity
-from backend.app.ai.ranking import compute_overall_score, determine_match_confidence
+from app.ai.llm_orchestrator import AIOrchestrator
+from app.ai.parser import parse_resume
+from app.ai.embeddings import calculate_similarity
+
 
 from shared.prompts.screening_prompts import RECRUITER_INSIGHTS_PROMPT, RECRUITER_SYSTEM_PROMPT
 
 
 class AIEngine:
     def __init__(self):
-        self.router = LLMRouter()
+        self.orchestrator = AIOrchestrator()
 
     def process_screening(self, jd_text: str, role_title: str, resumes: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
@@ -43,7 +43,7 @@ class AIEngine:
             filename = resume["filename"]
             raw_text = resume["content"]
             
-            parsed_profile = parse_candidate_resume(raw_text, filename)
+            parsed_profile = parse_resume(raw_text, filename)
             candidates_raw.append({
                 "filename": filename,
                 "profile": parsed_profile
@@ -79,15 +79,23 @@ class AIEngine:
             education_score = score_data["breakdown"]["education_match"]
 
             # Compute algorithm weighted score
-            overall_score = compute_overall_score(
-                semantic_score,
-                skills_score,
-                experience_score,
-                education_score
+            # ScreenIt uses the ranking weight values: W_SEMANTIC = 0.50, W_SKILLS = 0.25, W_EXPERIENCE = 0.15, W_EDUCATION = 0.10
+            overall_score = (
+                0.50 * semantic_score
+                + 0.25 * skills_score
+                + 0.15 * experience_score
+                + 0.10 * education_score
             )
             
             # Determine match status and recruiter confidence
-            match_status, confidence = determine_match_confidence(overall_score)
+            if overall_score >= 80:
+                match_status, confidence = "Strong Match", "High"
+            elif overall_score >= 65:
+                match_status, confidence = "Good Match", "Medium"
+            elif overall_score >= 50:
+                match_status, confidence = "Moderate Match", "Medium"
+            else:
+                match_status, confidence = "Weak Match", "Low"
             
             matched_skills = sorted(list(set(profile.get("skills", [])) & set(jd_requirements.get("required_skills", []))))
             missing_skills = sorted(list(set(jd_requirements.get("required_skills", [])) - set(profile.get("skills", []))))
@@ -135,7 +143,9 @@ class AIEngine:
                 "missing_skills": missing_skills,
                 "why_reasoning": why_reasons,
                 "risk_factors": risk_factors,
-                "raw_profile": profile
+                "raw_profile": profile,
+                "model_used": "Offline Rule Engine",
+                "latency": 0.0
             })
 
         # Sort candidates descending
@@ -154,7 +164,10 @@ class AIEngine:
                 required_education_label=jd_requirements["required_education_label"]
             )
             
-            insights = self.router.call_json(prompt, RECRUITER_SYSTEM_PROMPT, task=LLMTask.SUMMARY)
+            orchestrator_res = self.orchestrator.call_json("summary", prompt, RECRUITER_SYSTEM_PROMPT)
+            insights = orchestrator_res.get("json_data")
+            cand["model_used"] = orchestrator_res.get("model_used", "Offline Rule Engine")
+            cand["latency"] = orchestrator_res.get("latency", 0.0)
             
             if insights:
                 cand["recruiter_brief"] = insights.get("recruiter_brief", "")
@@ -189,3 +202,4 @@ class AIEngine:
             "processing_time": processing_time,
             "candidates": scored_candidates
         }
+
