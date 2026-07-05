@@ -36,9 +36,9 @@ from app.ai.skills_database import extract_skills
 
 def extract_text(file_path: str) -> str:
     """
-    Extract raw text from a PDF or plain-text resume file.
+    Extract raw text from a PDF, DOCX, or plain-text resume file.
 
-    Supports: .pdf, .txt, .md
+    Supports: .pdf, .docx, .txt, .md
     Raises ValueError for unsupported formats.
     """
     path = Path(file_path)
@@ -46,6 +46,27 @@ def extract_text(file_path: str) -> str:
 
     if suffix in (".txt", ".md"):
         return path.read_text(encoding="utf-8", errors="ignore")
+
+    if suffix == ".docx":
+        import zipfile
+        import xml.etree.ElementTree as ET
+        
+        NAMESPACE = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
+        PARA = NAMESPACE + 'p'
+        TEXT = NAMESPACE + 't'
+        
+        texts = []
+        try:
+            with zipfile.ZipFile(file_path) as docx:
+                xml_content = docx.read('word/document.xml')
+                root = ET.fromstring(xml_content)
+                for paragraph in root.iter(PARA):
+                    paragraph_text = "".join(node.text for node in paragraph.iter(TEXT) if node.text)
+                    if paragraph_text:
+                        texts.append(paragraph_text)
+            return "\n".join(texts)
+        except Exception as e:
+            raise ValueError(f"Failed to parse DOCX file: {e}")
 
     if suffix == ".pdf":
         if not PYMUPDF_AVAILABLE:
@@ -57,7 +78,7 @@ def extract_text(file_path: str) -> str:
             pages = [page.get_text("text") for page in doc]
         return "\n".join(pages)
 
-    raise ValueError(f"Unsupported resume format: {suffix!r}. Use .pdf or .txt")
+    raise ValueError(f"Unsupported resume format: {suffix!r}. Use .pdf, .docx, or .txt")
 
 
 def parse_resume(text: str, filename: str = "", use_llm: bool = True) -> dict:

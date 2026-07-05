@@ -47,10 +47,10 @@ export const NewScreeningPage: React.FC = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const selected = Array.from(e.target.files).filter(
-        (f) => f.name.endsWith(".txt") || f.name.endsWith(".pdf")
+        (f) => f.name.endsWith(".txt") || f.name.endsWith(".pdf") || f.name.endsWith(".docx")
       );
       if (selected.length === 0) {
-        setFileError("Only .txt and .pdf files are supported.");
+        setFileError("Only .txt, .pdf, and .docx files are supported.");
         return;
       }
       setFileError(null);
@@ -70,10 +70,10 @@ export const NewScreeningPage: React.FC = () => {
     e.preventDefault();
     if (e.dataTransfer.files) {
       const dropped = Array.from(e.dataTransfer.files).filter(
-        (f) => f.name.endsWith(".txt") || f.name.endsWith(".pdf")
+        (f) => f.name.endsWith(".txt") || f.name.endsWith(".pdf") || f.name.endsWith(".docx")
       );
       if (dropped.length === 0) {
-        setFileError("Only .txt and .pdf files are supported.");
+        setFileError("Only .txt, .pdf, and .docx files are supported.");
         return;
       }
       setFileError(null);
@@ -154,7 +154,7 @@ export const NewScreeningPage: React.FC = () => {
         {/* Resumes Drag & Drop */}
         <div className="space-y-2">
           <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold">
-            Resumes (.txt, .pdf)
+            Resumes (.txt, .pdf, .docx)
           </label>
           
           <div
@@ -166,7 +166,7 @@ export const NewScreeningPage: React.FC = () => {
             <input
               type="file"
               multiple
-              accept=".txt,.pdf"
+              accept=".txt,.pdf,.docx"
               ref={fileInputRef}
               onChange={handleFileChange}
               className="hidden"
@@ -175,7 +175,7 @@ export const NewScreeningPage: React.FC = () => {
             <p className="text-sm font-medium text-zinc-700">
               Drag & drop resumes here, or <span className="underline">browse files</span>
             </p>
-            <p className="text-xs text-zinc-400 mt-1">Supports PDF and Plain Text (.txt)</p>
+            <p className="text-xs text-zinc-400 mt-1">Supports PDF, DOCX, and Plain Text</p>
           </div>
 
           {fileError && (
