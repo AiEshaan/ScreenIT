@@ -36,3 +36,7 @@ python-dotenv>=1.0.1
 # Only needed if OPENROUTER_API_KEY or OPENAI_API_KEY is set.
 # The agent runs fully without an API key (regex parsing + rule-based summaries).
 openai>=1.0.0
+
+# ─── Testing ──────────────────────────────────────────────────────────────────
+pytest>=8.2.0
+
