@@ -118,35 +118,15 @@ Reports
 
 ---
 
-## Screenshots
+## Screenshots & Platform Tour
 
-### 1. Dashboard
-
-![Dashboard](docs/screenshots/1-dashboard.png)
-
-### 2. New Screening
-
-![New Screening](docs/screenshots/2-new-screening.png)
-
-### 3. Processing
-
-![Processing](docs/screenshots/3-processing.png)
-
-### 4. Candidate Review
-
-![Candidate Review](docs/screenshots/4-candidate-review.png)
-
-### 5. Comparison
-
-![Comparison](docs/screenshots/5-comparison.png)
-
-### 6. Analytics
-
-![Analytics](docs/screenshots/6-analytics.png)
-
-### 7. Settings
-
-![Settings](docs/screenshots/7-settings.png)
+| 🖥️ Dashboard Page | 📂 Start New Screening |
+| :---: | :---: |
+| ![Dashboard](docs/screenshots/dashboard.png) | ![New Screening](docs/screenshots/new-screening.png) |
+| **⚡ Resume Parsing Progress** | **⚙️ AI Provider & Routing Settings** |
+| ![Resume Parsing](docs/screenshots/resume-parsing.png) | ![Setting](docs/screenshots/setting.png) |
+| **🗒️ Campaign History Log** | **🔍 Scored Candidate Assessment** |
+| ![History Log](docs/screenshots/history-log.png) | ![Resume Agent Output](docs/screenshots/resume-agent-output.png) |
 
 ---
 
