@@ -38,42 +38,62 @@ class AIOrchestrator:
 
     def _call_model(
         self,
-        provider: str,
+        provider_or_model: str,
         system: str,
         prompt: str,
         max_tokens: int,
         temperature: float,
     ) -> Optional[Tuple[str, float]]:
         """
-        Attempts to call a provider model. Returns (content, latency) or None.
+        Attempts to call a model with backoff retry logic for 429 errors.
         """
-        client = self._get_client(provider)
-        if not client:
-            return None
-            
-        model = PROVIDER_MODELS.get(provider)
+        if "/" in provider_or_model:
+            model = provider_or_model
+            prefix = provider_or_model.split("/")[0].lower()
+            if prefix in ["openai", "anthropic", "google"]:
+                key_provider = "gemini" if prefix == "google" else prefix
+            else:
+                key_provider = "openrouter"
+        else:
+            model = PROVIDER_MODELS.get(provider_or_model)
+            key_provider = provider_or_model
+
         if not model:
             return None
 
-        start_time = time.time()
-        try:
-            response = client.chat.completions.create(
-                model=model,
-                messages=[
-                    {"role": "system", "content": system},
-                    {"role": "user",   "content": prompt},
-                ],
-                max_tokens=max_tokens,
-                temperature=temperature,
-            )
-            latency = round(time.time() - start_time, 2)
-            content = response.choices[0].message.content if response.choices else None
-            if content:
-                return content.strip(), latency
+        client = self._get_client(key_provider)
+        if not client:
             return None
-        except Exception as exc:
-            logger.warning(f"⚠️ Provider {provider} ({model}) failed: {exc}")
-            return None
+
+        max_retries = 2
+        for attempt in range(max_retries + 1):
+            start_time = time.time()
+            try:
+                response = client.chat.completions.create(
+                    model=model,
+                    messages=[
+                        {"role": "system", "content": system},
+                        {"role": "user",   "content": prompt},
+                    ],
+                    max_tokens=max_tokens,
+                    temperature=temperature,
+                )
+                latency = round(time.time() - start_time, 2)
+                content = response.choices[0].message.content if response.choices else None
+                if content:
+                    return content.strip(), latency
+            except Exception as exc:
+                exc_str = str(exc).lower()
+                is_rate_limit = "429" in exc_str or "rate limit" in exc_str or "too many requests" in exc_str
+                if is_rate_limit and attempt < max_retries:
+                    sleep_time = 2 * (attempt + 1)
+                    logger.warning(f"⚠️ Rate limit (429) hit on model {model}. Retrying in {sleep_time}s... (Attempt {attempt + 1}/{max_retries})")
+                    time.sleep(sleep_time)
+                    continue
+                else:
+                    logger.warning(f"⚠️ Provider call failed for {model}: {exc}")
+                    break
+        return None
 
     def call(
         self,

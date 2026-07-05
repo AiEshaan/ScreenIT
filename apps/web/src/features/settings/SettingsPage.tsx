@@ -23,6 +23,7 @@ export const SettingsPage: React.FC = () => {
     default: []
   });
   const [health, setHealth] = useState<any>(null);
+  const [models, setModels] = useState<{ id: string; name: string; free: boolean }[]>([]);
 
   // Fetch all preferences on mount
   useEffect(() => {
@@ -37,6 +38,9 @@ export const SettingsPage: React.FC = () => {
         
         const healthData = await api.getHealth();
         setHealth(healthData);
+
+        const modelsData = await api.getModels();
+        setModels(modelsData);
       } catch (err) {
         console.error(err);
       } finally {
@@ -96,7 +100,7 @@ export const SettingsPage: React.FC = () => {
     { id: "health", label: "System Health", icon: Activity }
   ] as const;
 
-  const availableModels = ["openai", "qwen", "anthropic", "gemini", "offline"];
+
 
   return (
     <motion.div
@@ -290,13 +294,34 @@ export const SettingsPage: React.FC = () => {
                               <select
                                 value={taskPrefs[cascadeIdx] || "offline"}
                                 onChange={(e) => handleRoutingChange(task, cascadeIdx, e.target.value)}
-                                className="w-full text-xs p-2 border border-zinc-200 rounded bg-zinc-50"
+                                className="w-full text-xs p-2 border border-zinc-200 rounded bg-zinc-50 focus:outline-none focus:ring-1 focus:ring-zinc-950"
                               >
-                                {availableModels.map((m) => (
-                                  <option key={m} value={m}>
-                                    {m === "offline" ? "Offline Fallback" : m.toUpperCase()}
-                                  </option>
-                                ))}
+                                {models.length === 0 ? (
+                                  <>
+                                    <option value="openai">OPENAI</option>
+                                    <option value="qwen">QWEN</option>
+                                    <option value="anthropic">ANTHROPIC</option>
+                                    <option value="gemini">GEMINI</option>
+                                    <option value="offline">Offline Fallback</option>
+                                  </>
+                                ) : (
+                                  <>
+                                    <optgroup label="Free Tier Models">
+                                      {models.filter(m => m.free).map((m) => (
+                                        <option key={m.id} value={m.id}>
+                                          {m.name}
+                                        </option>
+                                      ))}
+                                    </optgroup>
+                                    <optgroup label="Paid Models">
+                                      {models.filter(m => !m.free).map((m) => (
+                                        <option key={m.id} value={m.id}>
+                                          {m.name}
+                                        </option>
+                                      ))}
+                                    </optgroup>
+                                  </>
+                                )}
                               </select>
                             </div>
                           ))}

@@ -54,6 +54,12 @@ export const api = {
     return res.json();
   },
 
+  getModels: async (): Promise<any> => {
+    const res = await fetch("/api/settings/models");
+    if (!res.ok) throw new Error("Failed to fetch available models");
+    return res.json();
+  },
+
   getRouting: async (): Promise<any> => {
     const res = await fetch("/api/settings/routing");
     if (!res.ok) throw new Error("Failed to fetch routing cascades");
