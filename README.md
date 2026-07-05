@@ -179,19 +179,17 @@ ScreenIt/
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/yourusername/screenit.git
-cd screenit
+git clone https://github.com/AiEshaan/ScreenIT.git
+cd ScreenIT
 ```
 
-1. **Configure Environment**
+2. **Configure Environment**
 Create `.env` in the root:
 
 ```env
 OPENROUTER_API_KEY=your_api_key_here
-MODEL_PRIMARY=openai/gpt-oss-120b:free
-MODEL_FALLBACK=qwen/qwen3-next-80b-a3b-instruct:free
-DATABASE_URL=sqlite:///backend/screenit.db
 ```
+*(All provider keys and routing default configurations are managed dynamically through the platform Settings UI and stored locally).*
 
 ---
 
@@ -206,37 +204,38 @@ Launch the entire stack using the root launcher:
 - **Frontend:** `http://localhost:5173`
 - **Backend APIs:** `http://localhost:8000/docs`
 
-*(Note: If the backend is unreachable, the frontend falls back to a fully interactive Demo Mode).*
+The platform will run in production mode connecting directly to the FastAPI server and your local SQLite database.
 
 ---
 
 ## API Endpoints
 
 ```http
-POST /api/screen
-GET /api/runs
-GET /api/runs/{id}
-POST /api/compare
-GET /api/settings
+POST   /api/screen                  # Create campaign and parse resumes
+GET    /api/runs                    # Get all campaigns
+GET    /api/runs/{id}               # Get detailed campaign report
+DELETE /api/runs/{id}               # Delete campaign run and candidates (cascade)
+DELETE /api/candidates/{id}         # Delete candidate profile
+PATCH  /api/candidates/{id}         # Update candidate metadata or brief
+GET    /api/analytics               # Get dynamic database analytics
+GET    /api/settings/models         # Fetch active OpenRouter models (free vs paid)
+GET    /api/settings/keys           # Get provider keys configuration status
+POST   /api/settings/keys           # Save custom provider API key to .env
+GET    /api/settings/routing        # Retrieve task cascade orders
+POST   /api/settings/routing        # Update task routing priorities
+POST   /api/settings/test-key       # Validate provider API credentials
+GET    /api/settings/health         # Get database & embedding statuses
 ```
 
 ---
 
-## Model Routing Strategy
+## Model Routing Strategy & Resiliency
 
-The system uses task-aware fallback routing to optimize for speed, quality, and reliability across different free-tier models via OpenRouter.
+The system uses a **Cascading AI Orchestrator** to route tasks to priority models via OpenRouter:
 
-**Resume Parsing Strategy:**
-
-```text
-Qwen3 → GPT-OSS → Llama → Gemma → Offline Rules
-```
-
-**Recruiter Summary Strategy:**
-
-```text
-GPT-OSS → Qwen3 → Llama → Gemma → Offline Templates
-```
+- **Grouped Model Configurations**: Choose dynamically between free-tier models and paid models (GPT-4o Mini, Claude 3 Haiku, Gemini 2.5 Flash) directly in the UI.
+- **429 Rate Limit Recovery**: Implements an automatic exponential backoff retry loop (sleeps 2s/4s) when hitting OpenRouter free tier rate limits before failing over to the next priority.
+- **Offline Rule Engine**: If all configured cascade models fail, it falls back to a deterministic offline parser and scoring system to complete the task successfully.
 
 ---
 
@@ -244,13 +243,13 @@ GPT-OSS → Qwen3 → Llama → Gemma → Offline Templates
 
 Every recommendation includes:
 
-- Semantic Match
-- Skill Match
-- Experience Match
-- Education Match
-- Why Ranked
-- Recruiter Brief
-- AI Confidence
+- Semantic Similarity Match (Local vector match)
+- Skill Match (Direct keyword intersection)
+- Experience Match (Required years vs candidate years)
+- Education Match (Degree hierarchy validation)
+- Why Ranked (AI justification)
+- Recruiter Brief (Executive summary)
+- AI Confidence & Model telemetry metadata (Model used + Latency)
 
 This allows recruiters to **trust AI recommendations** rather than treating them as a black box.
 
@@ -277,6 +276,7 @@ This allows recruiters to **trust AI recommendations** rather than treating them
 - **Synchronous API vs Background Queue:** Currently blocks the HTTP request for simplicity in assessment environments. Production would implement Celery/Redis with WebSocket updates.
 - **Local Embeddings:** SentenceTransformers runs locally to eliminate API latency and cost, at the expense of slight initial server boot overhead.
 - **OpenRouter Multi-Model:** Used to prevent single-provider rate-limit bottlenecks and to match specific model modalities to tasks (Parsing vs Writing).
+
 
 ---
 
