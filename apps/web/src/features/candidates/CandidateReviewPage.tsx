@@ -248,6 +248,12 @@ export const CandidateReviewPage: React.FC = () => {
 
                   <p className="text-[11px] text-zinc-500 truncate">{cand.education_degree} degree</p>
 
+                  {cand.matched_skills && cand.matched_skills.length > 0 && (
+                    <p className="text-[10px] text-emerald-600 font-medium truncate mt-0.5">
+                      ✓ {cand.matched_skills.slice(0, 3).join(", ")}
+                    </p>
+                  )}
+
                   <div className="flex items-center gap-2 pt-1">
                     <Badge variant={getScoreColor(cand.overall_score)}>
                       Rank #{idx + 1}
