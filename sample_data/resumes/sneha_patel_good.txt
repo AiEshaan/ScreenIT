@@ -1,0 +1,39 @@
+Sneha Patel
+sneha.patel@outlook.com | +91-8765432109 | github.com/sneha-ai
+Ahmedabad, India
+
+SUMMARY
+AI/ML Engineer with 2 years of experience specializing in NLP applications and conversational AI. Built production LLM pipelines and deployed machine learning models at scale. B.Tech graduate with strong fundamentals in Python and deep learning.
+
+EXPERIENCE
+
+Machine Learning Engineer at Juspay Technologies
+Aug 2022 - Present
+• Designed and deployed NLP text classification pipeline using PyTorch and Transformers (BERT)
+• Built conversational AI chatbot using LangChain and OpenAI GPT-3.5 reducing support tickets by 35%
+• Implemented Retrieval Augmented Generation (RAG) system with FAISS vector store
+• Created FastAPI endpoints for ML model serving with async request handling
+• Conducted A/B Testing experiments to evaluate model improvements in production
+• Used Pandas and NumPy for large-scale data preprocessing (10M+ records)
+
+Junior ML Intern at Zeta Suite
+Jan 2022 - Jul 2022
+• Trained text classification models with scikit-learn and evaluated with precision/recall metrics
+• Explored Hugging Face model hub for pre-trained NLP models
+• Wrote Python scripts for data cleaning and feature engineering
+• Used Git for version control and GitHub for collaboration
+
+EDUCATION
+
+Bachelor of Technology in Computer Science and Engineering
+Nirma University — 2022
+
+SKILLS
+Python, Machine Learning, Deep Learning, NLP, Natural Language Processing, PyTorch, TensorFlow,
+scikit-learn, Hugging Face, Transformers, BERT, LangChain, OpenAI, GPT, FastAPI, REST API,
+Pandas, NumPy, FAISS, RAG, Vector Database, Embeddings, Prompt Engineering, Feature Engineering,
+Git, GitHub, Docker, PostgreSQL, Redis, Pytest, A/B Testing, Jupyter
+
+PROJECTS
+AI Document Summarizer — LangChain + GPT-4 pipeline for legal document summarization
+Multilingual NLP Toolkit — Open-source Python library for multilingual text processing (150+ GitHub stars)

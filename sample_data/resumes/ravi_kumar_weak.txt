@@ -1,0 +1,26 @@
+Ravi Kumar
+ravi.kumar99@yahoo.com | +91-7654321098
+Hyderabad, India
+
+OBJECTIVE
+Fresh graduate seeking entry level software job. I have done some online courses in Python and want to learn AI.
+
+EDUCATION
+
+Bachelor of Science in Mathematics
+Osmania University — 2024
+
+EXPERIENCE
+
+Freelance Web Developer
+2023 - 2024
+• Made websites for local businesses using HTML and CSS
+• Used JavaScript for basic interactivity
+• No professional ML experience
+
+SKILLS
+HTML, CSS, JavaScript, Python (basic), Excel, MS Word
+
+PROJECTS
+Calculator App — Simple Python calculator script
+Blog Website — Static website using HTML and CSS

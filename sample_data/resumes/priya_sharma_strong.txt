@@ -1,0 +1,46 @@
+Priya Sharma
+priya.sharma@email.com | +91-9876543210 | linkedin.com/in/priyasharma | github.com/priyasharma
+Bengaluru, India
+
+SUMMARY
+AI Engineer with 3 years of experience building NLP pipelines and LLM-powered applications. Passionate about turning cutting-edge research into production-ready AI systems. Strong background in Python, Transformers, and LangChain.
+
+EXPERIENCE
+
+Senior AI Engineer at DataMind AI
+Jan 2023 - Present
+• Built a document Q&A system using RAG architecture with LangChain, FAISS, and GPT-4 serving 50K daily users
+• Fine-tuned BERT models for named entity recognition achieving 94% F1 score on proprietary dataset
+• Deployed NLP pipelines as FastAPI microservices on AWS Lambda with 99.9% uptime
+• Implemented semantic search using SentenceTransformer embeddings reducing retrieval latency by 60%
+• Mentored 2 junior engineers on LLM prompt engineering and evaluation best practices
+
+AI Engineer at TechCorp Solutions
+Jun 2021 - Dec 2022
+• Developed text classification models using scikit-learn and Hugging Face Transformers
+• Built data preprocessing pipelines with Pandas and NumPy for 1M+ record datasets
+• Created REST APIs using Flask and FastAPI for ML model serving
+• Integrated OpenAI GPT APIs into customer support automation workflows
+• Wrote comprehensive unit tests with Pytest achieving 87% code coverage
+
+EDUCATION
+
+Master of Technology in Artificial Intelligence
+Indian Institute of Technology, Bombay — 2021
+
+Bachelor of Engineering in Computer Science
+National Institute of Technology, Surathkal — 2019
+
+SKILLS
+Python, Machine Learning, Deep Learning, NLP, Natural Language Processing, LangChain, LangGraph,
+TensorFlow, PyTorch, scikit-learn, Hugging Face, Transformers, BERT, GPT, OpenAI, Anthropic, Claude,
+FastAPI, Flask, REST API, Pandas, NumPy, SentenceTransformer, FAISS, Pinecone, RAG,
+Vector Database, Embeddings, Docker, AWS, GCP, Git, GitHub, Pytest, Redis, PostgreSQL,
+Feature Engineering, Prompt Engineering, Fine-tuning, MLflow
+
+PROJECTS
+LLM Resume Screener — github.com/priyasharma/llm-screener
+  Production RAG pipeline that ranks resumes against job descriptions using semantic embeddings.
+
+Multilingual Sentiment Analyzer — github.com/priyasharma/multilingual-sentiment
+  Fine-tuned multilingual BERT on 200K review dataset. Deployed via FastAPI + Docker.

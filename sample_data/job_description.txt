@@ -1,0 +1,36 @@
+Junior AI Engineer — NLP & LLM Applications
+
+About the Role
+We are looking for a Junior AI Engineer to join our AI Research & Products team. You will work on building and deploying NLP pipelines, LLM-powered applications, and data processing systems that serve millions of users.
+
+Responsibilities
+- Design, train, and evaluate NLP and machine learning models
+- Build and integrate LLM-based pipelines using LangChain or LangGraph
+- Implement data preprocessing, feature engineering, and embedding pipelines
+- Deploy models as REST APIs using FastAPI or Flask
+- Collaborate with product and data teams to translate requirements into AI solutions
+- Write clean, testable Python code with unit tests
+- Monitor and improve model performance in production
+
+Requirements
+- Bachelor's degree in Computer Science, AI, Data Science, or related field
+- 1-2 years of experience in AI, NLP, or software engineering
+- Strong Python programming skills
+- Hands-on experience with Machine Learning (scikit-learn, TensorFlow, or PyTorch)
+- Experience with NLP and text processing (BERT, Transformers, Hugging Face)
+- Familiarity with LLM APIs (OpenAI, Anthropic) and frameworks (LangChain)
+- Knowledge of REST API development (FastAPI or Flask)
+- Experience with SQL and data manipulation (Pandas, NumPy)
+- Version control with Git
+
+Nice to Have
+- Experience with vector databases (FAISS, Pinecone, Chroma)
+- Knowledge of RAG (Retrieval Augmented Generation) architectures
+- Docker and basic cloud deployment (AWS or GCP)
+- Contributions to open-source AI projects
+
+What We Offer
+- Competitive salary and equity
+- Remote-first culture
+- Access to the latest AI research and GPU compute
+- Mentorship from senior AI researchers

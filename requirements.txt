@@ -1,0 +1,38 @@
+# ─── PDF Extraction ───────────────────────────────────────────────────────────
+# PyMuPDF: fast, reliable PDF text extraction (handles complex layouts)
+# Tradeoff over pypdf: 3× faster, better multi-column handling, actively maintained
+PyMuPDF>=1.24.0
+
+# ─── NLP & Semantic Similarity (ML component) ────────────────────────────────
+# sentence-transformers: pretrained transformer model for semantic embeddings
+# Model: all-MiniLM-L6-v2 (~80MB, downloads on first run, then cached offline)
+# Tradeoff over TF-IDF: captures semantic meaning, not just keyword overlap
+sentence-transformers>=3.0.0
+
+# PyTorch: required backend for sentence-transformers
+# CPU version is sufficient for inference (no GPU needed)
+torch>=2.0.0
+
+# scikit-learn: cosine_similarity computation
+scikit-learn>=1.5.0
+
+# NumPy: numerical operations
+numpy>=1.26.0
+
+# ─── Date Parsing ─────────────────────────────────────────────────────────────
+# python-dateutil: robust date parsing for resume experience date ranges
+# Handles "Jan 2022", "January 2022 – Present", "2020 – 2023", etc.
+python-dateutil>=2.9.0
+
+# ─── Output ───────────────────────────────────────────────────────────────────
+pandas>=2.0.0        # CSV output generation
+tabulate>=0.9.0      # terminal table formatting
+colorama>=0.4.6      # cross-platform ANSI color (Windows compatible)
+
+# ─── Environment ──────────────────────────────────────────────────────────────
+python-dotenv>=1.0.1
+
+# ─── LLM Integration (optional) ───────────────────────────────────────────────
+# Only needed if OPENROUTER_API_KEY or OPENAI_API_KEY is set.
+# The agent runs fully without an API key (regex parsing + rule-based summaries).
+openai>=1.0.0

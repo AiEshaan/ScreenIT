@@ -1,0 +1,35 @@
+Arjun Mehta
+arjun.mehta@gmail.com | +91-9123456789 | linkedin.com/in/arjunmehta
+Pune, India
+
+OBJECTIVE
+Python Developer with 1.5 years experience looking to transition into AI/ML engineering. Have completed several NLP projects using scikit-learn and Hugging Face during self-study.
+
+EXPERIENCE
+
+Software Developer at Infosys Limited
+Jul 2022 - Present
+• Developed backend REST APIs using Flask and PostgreSQL for a banking portal
+• Wrote SQL queries and data transformation scripts using Pandas
+• Maintained CI/CD pipelines using Jenkins and GitHub Actions
+• Collaborated with frontend teams on API integration
+
+Intern at Wipro Technologies
+Jan 2022 - Jun 2022
+• Assisted in building data extraction scripts in Python
+• Worked on MySQL database optimizations
+• Wrote unit tests using Pytest
+
+EDUCATION
+
+Bachelor of Technology in Computer Science
+Pune University — 2022
+
+SKILLS
+Python, SQL, Flask, REST API, Pandas, NumPy, Git, GitHub, PostgreSQL, MySQL,
+scikit-learn, Machine Learning, Pytest, Jenkins, GitHub Actions, CI/CD, Linux,
+Matplotlib, Jupyter, Docker
+
+PROJECTS
+Sentiment Analysis — NLP project using scikit-learn TF-IDF and Logistic Regression
+Text Classifier — Built with Hugging Face Transformers for news categorization
