@@ -1,4 +1,4 @@
-# ScreenIt
+# ScreenIT
 
 ---
 
@@ -9,11 +9,21 @@
 
 ---
 
+![Python](https://img.shields.io/badge/Python-3.13-blue?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![OpenRouter](https://img.shields.io/badge/OpenRouter-Hybrid_AI-6C47FF?logo=openai&logoColor=white)
+![SentenceTransformers](https://img.shields.io/badge/SentenceTransformers-all--MiniLM--L6--v2-orange)
+![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?logo=sqlite&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green)
+
+---
+
 ![Dashboard](docs/screenshots/dashboard.png)
 
-### AI Recruiter Copilot
+### AI Resume Intelligence Platform
 
-Explainable AI Resume Screening Platform
+Explainable AI-Powered Resume Screening Agent
 
 ⭐ Semantic Ranking  
 ⭐ Hybrid AI Routing  
@@ -99,21 +109,39 @@ SQLite (Persistence)
 ```text
 Resume
    ↓
-Parser
+Parser (PDF/DOCX/TXT → Regex + LLM enhance)
    ↓
-Feature Extraction
+Context Builder (Structured JSON facts)
    ↓
-Embedding
+Embeddings (SentenceTransformer, cached)
    ↓
-Similarity
+Ranking Engine (Semantic 50% + Skills 25% + Exp 15% + Edu 10%)
    ↓
-Ranking
+AI Orchestrator (OpenRouter cascade → Offline fallback)
    ↓
-Recruiter Brief
+Recruiter Brief + Interview Questions
    ↓
-Interview Questions
-   ↓
-Reports
+React Dashboard (Analytics, History, Comparison, Export)
+```
+
+## 🏗️ Architecture Diagram
+
+```mermaid
+graph TD
+    A[Recruiter] --> B[Upload JD + Resumes]
+    B --> C[Resume Parser\nPDF / DOCX / TXT]
+    C --> D[Context Builder\nStructured JSON]
+    D --> E[Embedding Engine\nSentenceTransformer + Cache]
+    E --> F[Ranking Engine\nSemantic + Skills + Exp + Edu]
+    F --> G[AI Orchestrator]
+    G --> H{OpenRouter Cascade}
+    H -->|Primary| I[GPT-OSS 120B]
+    H -->|Fallback 1| J[Qwen3 80B]
+    H -->|Fallback 2| K[Llama 3.3 70B]
+    H -->|Fallback 3| L[Gemma 2 27B]
+    H -->|Offline| M[Rule Engine]
+    I & J & K & L & M --> N[Recruiter Brief\n+ Interview Questions]
+    N --> O[React Dashboard\nAnalytics · History · Export]
 ```
 
 ---
@@ -281,12 +309,31 @@ This allows recruiters to **trust AI recommendations** rather than treating them
 
 ## Future Roadmap
 
-- ATS Integrations (Greenhouse, Lever)
-- Interview Scheduling
-- Team Collaboration
-- Recruiter Feedback Learning
-- Candidate Chat
-- Multi-language Support
+**Infrastructure & Deployment**
+- 🐳 Docker Compose — one-command setup for backend + frontend + DB
+- ☁️ Cloud Deployment — Frontend on Vercel, Backend on Railway/Fly.io
+- 🗄️ PostgreSQL — swap SQLite for production-grade database
+- ⚡ Redis + Celery — background job queue with real-time WebSocket updates
+- 🔐 JWT Authentication — recruiter login and multi-user support
+- 📦 S3-compatible resume storage (AWS S3 / Cloudflare R2)
+
+**AI & Intelligence**
+- 🧠 Fine-tuned embedding model trained on recruitment domain data
+- 🔄 Continuous learning from recruiter accept/reject feedback
+- 📊 Advanced analytics with cohort analysis and hiring funnel metrics
+- 🤖 Interview scheduling agent integration
+
+**Product Features**
+- 🌐 ATS Integrations — Greenhouse, Lever, Workday
+- 💬 Candidate Chat — AI-powered candidate Q&A interface
+- 🌍 Multi-language resume support
+- 📋 Collaborative team screening with recruiter notes
+- 🔔 Email/Slack notification pipeline for shortlist alerts
+
+**Engineering**
+- ✅ Automated test suite — pytest + Playwright E2E
+- 🚀 GitHub Actions CI/CD pipeline
+- 📈 Prometheus + Grafana observability stack
 
 ---
 
