@@ -1,5 +1,14 @@
 # ScreenIt
 
+---
+
+### 🏆 Rooman Technologies – 24-Hour AI Agent Challenge
+* **Category:** Category 1 – People & HR
+* **Selected Agent:** Resume Screening Agent
+* **Project Name:** ScreenIT – AI Resume Screening Platform
+
+---
+
 ![Dashboard](docs/screenshots/dashboard.png)
 
 ### AI Recruiter Copilot
