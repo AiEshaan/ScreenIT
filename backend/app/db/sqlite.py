@@ -190,6 +190,53 @@ def get_run_details(run_id: str) -> Optional[Dict[str, Any]]:
     run_data["candidates"] = candidates
     return run_data
 
+def delete_run(run_id: str) -> bool:
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("PRAGMA foreign_keys = ON")
+    cursor.execute("DELETE FROM runs WHERE run_id = ?", (run_id,))
+    deleted = cursor.rowcount > 0
+    conn.commit()
+    conn.close()
+    return deleted
+
+def delete_candidate(candidate_id: str) -> bool:
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM candidates WHERE id = ?", (candidate_id,))
+    deleted = cursor.rowcount > 0
+    conn.commit()
+    conn.close()
+    return deleted
+
+def update_candidate(candidate_id: str, updates: Dict[str, Any]) -> bool:
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    # Filter valid columns to update
+    valid_cols = ["name", "email", "phone", "linkedin", "github", "overall_score", 
+                  "confidence", "match_status", "recruiter_brief", "model_used"]
+    
+    set_clauses = []
+    params = []
+    for col, val in updates.items():
+        if col in valid_cols:
+            set_clauses.append(f"{col} = ?")
+            params.append(val)
+            
+    if not set_clauses:
+        conn.close()
+        return False
+        
+    params.append(candidate_id)
+    query = f"UPDATE candidates SET {', '.join(set_clauses)} WHERE id = ?"
+    cursor.execute(query, params)
+    updated = cursor.rowcount > 0
+    conn.commit()
+    conn.close()
+    return updated
+
+
 def get_routing_prefs() -> Dict[str, List[str]]:
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()

@@ -78,7 +78,34 @@ export const api = {
     });
     if (!res.ok) throw new Error("Key validation test failed");
     return res.json();
+  },
+
+  deleteRun: async (runId: string): Promise<any> => {
+    const res = await fetch(`/api/runs/${runId}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) throw new Error("Failed to delete campaign run");
+    return res.json();
+  },
+
+  deleteCandidate: async (candidateId: string): Promise<any> => {
+    const res = await fetch(`/api/candidates/${candidateId}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) throw new Error("Failed to delete candidate");
+    return res.json();
+  },
+
+  updateCandidate: async (candidateId: string, updates: any): Promise<any> => {
+    const res = await fetch(`/api/candidates/${candidateId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updates),
+    });
+    if (!res.ok) throw new Error("Failed to update candidate assessment");
+    return res.json();
   }
 };
+
 
 

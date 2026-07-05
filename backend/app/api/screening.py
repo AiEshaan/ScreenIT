@@ -7,7 +7,7 @@ import shutil
 import tempfile
 
 from app.services.screening_service import AIEngine
-from app.db.sqlite import init_db, save_run, save_candidate, get_runs, get_run_details, get_analytics_dashboard
+from app.db.sqlite import init_db, save_run, save_candidate, get_runs, get_run_details, get_analytics_dashboard, delete_run, delete_candidate, update_candidate
 from app.api.system import router as system_router
 
 app = FastAPI(title="ScreenIt API", description="AI Resume Screening Platform Backend")
@@ -101,4 +101,26 @@ async def get_analytics():
         return get_analytics_dashboard()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/runs/{run_id}")
+async def remove_run(run_id: str):
+    success = delete_run(run_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Run not found")
+    return {"status": "success", "message": f"Run {run_id} deleted successfully"}
+
+@app.delete("/api/candidates/{candidate_id}")
+async def remove_candidate(candidate_id: str):
+    success = delete_candidate(candidate_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Candidate not found")
+    return {"status": "success", "message": f"Candidate {candidate_id} deleted successfully"}
+
+@app.patch("/api/candidates/{candidate_id}")
+async def patch_candidate(candidate_id: str, updates: dict):
+    success = update_candidate(candidate_id, updates)
+    if not success:
+         raise HTTPException(status_code=400, detail="Failed to update candidate or no updates provided")
+    return {"status": "success", "message": f"Candidate {candidate_id} updated successfully"}
+
 
