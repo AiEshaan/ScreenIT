@@ -33,7 +33,7 @@ Traditional ATS systems rely heavily on keyword matching, causing qualified cand
 
 ### Solution
 
-ScreenIt solves this by combining semantic understanding, structured resume parsing, explainable ranking, and AI-generated recruiter insights to help hiring teams make faster and more confident hiring decisions.
+ScreenIT is an AI-powered **Resume Screening Agent** (Category 1 – People & HR) that automatically parses resumes, extracts structured candidate information, performs semantic matching against job descriptions using SentenceTransformers, ranks candidates with an explainable scoring engine, and generates recruiter-ready AI summaries through a hybrid LLM routing system with automatic fallback and offline resilience.
 
 ```text
 Recruiter
@@ -127,6 +127,16 @@ Reports
 | ![Resume Parsing](docs/screenshots/resume-parsing.png) | ![Setting](docs/screenshots/setting.png) |
 | **🗒️ Campaign History Log** | **🔍 Scored Candidate Assessment** |
 | ![History Log](docs/screenshots/history-log.png) | ![Resume Agent Output](docs/screenshots/resume-agent-output.png) |
+
+---
+
+## 🎯 Live AI Screening Results
+
+Real output produced by ScreenIT — candidates ranked with explainable scores, AI recruiter briefs, and skill gap analysis.
+
+| Result View 1 | Result View 2 | Result View 3 |
+| :---: | :---: | :---: |
+| ![Result 1](docs/results/results-1.png) | ![Result 2](docs/results/results-2.png) | ![Result 3](docs/results/results-3.png) |
 
 ---
 
