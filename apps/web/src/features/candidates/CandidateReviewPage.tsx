@@ -81,6 +81,116 @@ export const CandidateReviewPage: React.FC = () => {
     return "neutral";
   };
 
+  // ── Export utilities ────────────────────────────────────────────────────────
+
+  const exportJSON = () => {
+    const payload = {
+      run_id:        run.run_id,
+      role_title:    run.role_title,
+      exported_at:   new Date().toISOString(),
+      candidates:    run.candidates.map((c: any) => ({
+        rank:            c.rank ?? run.candidates.indexOf(c) + 1,
+        name:            c.name,
+        email:           c.email,
+        overall_score:   c.overall_score,
+        match_status:    c.match_status,
+        experience_years: c.experience_years,
+        education_degree: c.education_degree,
+        matched_skills:  c.matched_skills,
+        missing_skills:  c.missing_skills,
+        scores:          c.scores,
+        recruiter_brief: c.recruiter_brief,
+      })),
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `ScreenIT_${run.role_title.replace(/\s+/g, "_")}_${run.run_id.slice(0, 8)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportCSV = () => {
+    const headers = [
+      "Rank", "Name", "Email", "Overall Score", "Match Status",
+      "Experience (yrs)", "Education", "Matched Skills", "Missing Skills",
+      "Semantic Score", "Skills Score", "Experience Score", "Education Score",
+      "Recruiter Brief",
+    ];
+    const escape = (v: any) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const rows = run.candidates.map((c: any, i: number) => [
+      escape(i + 1),
+      escape(c.name),
+      escape(c.email),
+      escape(c.overall_score),
+      escape(c.match_status),
+      escape(c.experience_years),
+      escape(c.education_degree),
+      escape((c.matched_skills ?? []).join("; ")),
+      escape((c.missing_skills ?? []).join("; ")),
+      escape(c.scores?.semantic ?? ""),
+      escape(c.scores?.skills ?? ""),
+      escape(c.scores?.experience ?? ""),
+      escape(c.scores?.education ?? ""),
+      escape(c.recruiter_brief ?? ""),
+    ]);
+    const csv  = [headers.join(","), ...rows.map((r: string[]) => r.join(","))].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `ScreenIT_${run.role_title.replace(/\s+/g, "_")}_${run.run_id.slice(0, 8)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportPDF = () => {
+    // Build a styled HTML page and print it as PDF via the browser's print dialog
+    const rows = run.candidates.map((c: any, i: number) => `
+      <tr style="border-bottom:1px solid #e5e7eb;">
+        <td style="padding:8px 12px;font-weight:600;">${i + 1}</td>
+        <td style="padding:8px 12px;">${c.name ?? ""}</td>
+        <td style="padding:8px 12px;">${c.email ?? ""}</td>
+        <td style="padding:8px 12px;font-weight:700;">${c.overall_score}</td>
+        <td style="padding:8px 12px;">${c.match_status ?? ""}</td>
+        <td style="padding:8px 12px;">${c.experience_years ?? 0} yrs</td>
+        <td style="padding:8px 12px;">${(c.matched_skills ?? []).slice(0, 4).join(", ")}</td>
+        <td style="padding:8px 12px;font-size:11px;color:#6b7280;">${(c.recruiter_brief ?? "").slice(0, 120)}${(c.recruiter_brief ?? "").length > 120 ? "..." : ""}</td>
+      </tr>
+    `).join("");
+
+    const html = `
+      <!DOCTYPE html><html><head><meta charset="utf-8">
+      <title>ScreenIT – ${run.role_title}</title>
+      <style>
+        body { font-family: -apple-system, sans-serif; padding: 32px; color: #111; }
+        h1   { font-size: 22px; margin-bottom: 4px; }
+        p    { color: #6b7280; font-size: 13px; margin-bottom: 24px; }
+        table{ width: 100%; border-collapse: collapse; font-size: 12px; }
+        th   { background: #f4f4f5; text-align: left; padding: 8px 12px;
+               font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+        @media print { body { padding: 16px; } }
+      </style></head><body>
+      <h1>ScreenIT — ${run.role_title} Shortlist</h1>
+      <p>Run ID: ${run.run_id} &nbsp;|&nbsp; Exported: ${new Date().toLocaleString()}</p>
+      <table><thead><tr>
+        <th>#</th><th>Name</th><th>Email</th><th>Score</th><th>Match</th>
+        <th>Experience</th><th>Matched Skills</th><th>AI Summary</th>
+      </tr></thead><tbody>${rows}</tbody></table>
+      <script>window.onload=()=>{ window.print(); }<\/script>
+      </body></html>
+    `;
+    const win = window.open("", "_blank");
+    if (win) { win.document.write(html); win.document.close(); }
+  };
+
+  const exportHandlers: Record<string, () => void> = {
+    PDF:  exportPDF,
+    CSV:  exportCSV,
+    JSON: exportJSON,
+  };
+
   return (
     <div className="flex-1 flex h-screen overflow-hidden">
       {/* 1. Left List Pane (Recruiter list column) */}
@@ -207,8 +317,12 @@ export const CandidateReviewPage: React.FC = () => {
                 {/* Export Options */}
                 <div className="flex gap-2 pt-1">
                   <span className="text-[10px] uppercase font-mono tracking-wider text-zinc-400 font-bold self-center mr-2">Export</span>
-                  {["PDF", "CSV", "JSON"].map(format => (
-                    <button key={format} className="flex items-center gap-1 px-2 py-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-600 rounded text-[10px] font-mono font-semibold transition-colors">
+                  {(["PDF", "CSV", "JSON"] as const).map(format => (
+                    <button
+                      key={format}
+                      onClick={exportHandlers[format]}
+                      className="flex items-center gap-1 px-2 py-1 bg-zinc-100 hover:bg-zinc-200 active:bg-zinc-300 text-zinc-600 rounded text-[10px] font-mono font-semibold transition-colors cursor-pointer"
+                    >
                       <Download className="w-3 h-3" />
                       {format}
                     </button>
