@@ -16,7 +16,7 @@ PROVIDER_MODELS = {
     "openai":    "openai/gpt-oss-120b:free",
     "qwen":      "qwen/qwen3-next-80b-a3b-instruct:free",
     "anthropic": "meta-llama/llama-3.3-70b-instruct:free",  # Free-tier conversational fallback via OpenRouter
-    "gemini":    "google/gemma-2-27b-it:free",              # Fixed: gemma-4-31b:free is not a valid ID
+    "gemini":    "google/gemma-2-9b-it:free",              # Using gemma-2-9b-it:free as the standard active free model
 }
 
 class AIOrchestrator:
