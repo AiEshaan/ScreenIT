@@ -153,9 +153,16 @@ export const NewScreeningPage: React.FC = () => {
 
         {/* Resumes Drag & Drop */}
         <div className="space-y-2">
-          <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold">
-            Resumes (.txt, .pdf, .docx)
-          </label>
+          <div className="flex justify-between items-center">
+            <label className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold">
+              Resumes (.txt, .pdf, .docx)
+            </label>
+            {files.length > 0 && (
+              <span className="text-xs font-semibold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full font-mono">
+                {files.length} {files.length === 1 ? "resume" : "resumes"} staged
+              </span>
+            )}
+          </div>
           
           <div
             onDragOver={onDragOver}
