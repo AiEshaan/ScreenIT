@@ -30,6 +30,12 @@ export interface Candidate {
   raw_profile?: any;
   model_used?: string;
   latency?: number;
+  parser_confidence?: {
+    score: number;
+    label: "High" | "Medium" | "Low";
+    missing_fields: string[];
+    reason: string;
+  };
 }
 
 export interface ScreeningRun {

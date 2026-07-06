@@ -358,13 +358,25 @@ export const CandidateReviewPage: React.FC = () => {
                 
                 <div className="text-left space-y-1.5">
                   <div className="flex justify-between items-center text-[10px] text-zinc-500 font-mono">
-                    <span>AI Confidence</span>
-                    <span className="font-bold text-zinc-700">{selectedCandidate.confidence === "High" ? "94%" : selectedCandidate.confidence === "Medium" ? "72%" : "45%"}</span>
+                    <span title={selectedCandidate.parser_confidence?.reason ?? "Confidence score of parsed resume data"}>
+                      Parser Confidence
+                    </span>
+                    <span className="font-bold text-zinc-700">
+                      {selectedCandidate.parser_confidence?.score ?? (selectedCandidate.confidence === "High" ? 94 : selectedCandidate.confidence === "Medium" ? 72 : 45)}%
+                    </span>
                   </div>
                   <div className="w-full bg-zinc-200 rounded-full h-1.5 overflow-hidden">
                     <div
-                      className={`h-full ${selectedCandidate.confidence === "High" ? "bg-emerald-500" : selectedCandidate.confidence === "Medium" ? "bg-amber-400" : "bg-zinc-400"}`}
-                      style={{ width: selectedCandidate.confidence === "High" ? "94%" : selectedCandidate.confidence === "Medium" ? "72%" : "45%" }}
+                      className={`h-full ${
+                        (selectedCandidate.parser_confidence?.label ?? selectedCandidate.confidence) === "High"
+                          ? "bg-emerald-500"
+                          : (selectedCandidate.parser_confidence?.label ?? selectedCandidate.confidence) === "Medium"
+                          ? "bg-amber-400"
+                          : "bg-red-400"
+                      }`}
+                      style={{
+                        width: `${selectedCandidate.parser_confidence?.score ?? (selectedCandidate.confidence === "High" ? 94 : selectedCandidate.confidence === "Medium" ? 72 : 45)}%`
+                      }}
                     />
                   </div>
                 </div>
